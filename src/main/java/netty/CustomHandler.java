@@ -98,7 +98,5 @@ public class CustomHandler extends SimpleChannelInboundHandler<HttpObject> {
             // 把响应刷到客户端
             ctx.writeAndFlush(response);
         }
-
-
     }
 }
