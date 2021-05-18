@@ -6,11 +6,90 @@
     <title></title>
     <script src="js/mui.min.js"></script>
     <link href="css/mui.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="css/header.css" />
+    <link rel="stylesheet" href="fonticon/iconfont.css" />
     <script type="text/javascript" charset="utf-8">
       	mui.init();
+      	mui.plusReady(function(){
+      		plus.navigator.setStatusBarStyle("light")
+      		plus.navigator.setStatusBarBackground("#2AC845")
+      	})
     </script>
 </head>
 <body>
-	123
+	<header class="mui-bar mui-bar-nav title">
+	    <h1 class="mui-title title-color">wi信</h1>
+
+	</header>
+	<nav class="mui-bar mui-bar-tab">
+	    <a class="mui-tab-item mui-active" tabindex="0">
+	        <span class="mui-icon mui-icon-chat"></span>
+	        <span class="mui-tab-label">wichat</span>
+	    </a>
+	    <a class="mui-tab-item" tabindex="1">
+	        <span class="mui-icon mui-icon-personadd"></span>
+	        <span class="mui-tab-label">通讯录</span>
+	    </a>
+	    <a class="mui-tab-item" tabindex="2">
+	        <span class="mui-icon iconfont icon-pengyouquan"></span>
+	        <span class="mui-tab-label">发现</span>
+	    </a>
+	    <a class="mui-tab-item" tabindex="3">
+	        <span class="mui-icon mui-icon-person"></span>
+	        <span class="mui-tab-label">我</span>
+	    </a>
+	</nav>
+	
+    <script type="text/javascript" charset="utf-8">
+    	var muxinArray = [
+	    	{
+	    		pageId: "imooc-chatlist.html", 
+	    		pageUrl: "imooc-chatlist.html"
+	    	},{
+	    		pageId: "imooc-content.html", 
+	    		pageUrl: "imooc-content.html"
+	    	},{
+	    		pageId: "imooc-discover.html", 
+	    		pageUrl: "imooc-discover.html"
+	    	},{
+	    		pageId: "imooc-me.html", 
+	    		pageUrl: "imooc-me.html"
+	    	},
+    	];
+    	
+    	var muxinStyle = {
+    		top : "44px", 
+    		bottom: "50px"
+    	}
+    	mui.plusReady(function(){
+    		//获取当前的webview对象
+    		var indexWebview = plus.webview.currentWebview()
+    		//想当前的主页webview追加子页的4张webview对象
+    		for(var i = 0; i < muxinArray.length; i++){
+    			var muxinPage = plus.webview.create(muxinArray[i].pageUrl, 
+    				muxinArray[i].pageId,
+    				muxinStyle)
+    			//隐藏webview窗口
+    			muxinPage.hide();
+    			//追加每一个子页面到当前主页面
+    			indexWebview.append(muxinPage);
+    		}
+    		plus.webview.show(muxinArray[0].pageId);
+    		
+    		
+    		//批量绑定tap事件，展示不同的页面
+    		mui(".mui-bar-tab").on("tap", "a",function(){
+    			//获取当前a标签属性
+    			var tabindex = this.getAttribute("tabindex")
+    			//显示点击tab选项所对应的页面
+    			plus.webview.show(muxinArray[tabindex].pageId, "fade-in")
+    			for(var i = 0; i < muxinArray.length; i++){
+    				if(i != tabindex){
+    					plus.webview.hide(muxinArray[i].pageId, "fade-out")
+    				}
+    			}
+    		})    		
+    	})
+    </script>
 </body>
 </html>

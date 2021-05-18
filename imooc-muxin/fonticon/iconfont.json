@@ -1,0 +1,23 @@
+{
+  "id": "2553996",
+  "name": "imooc",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "866502",
+      "name": "朋友圈",
+      "font_class": "pengyouquan",
+      "unicode": "e628",
+      "unicode_decimal": 58920
+    },
+    {
+      "icon_id": "3742456",
+      "name": "微信",
+      "font_class": "weixin",
+      "unicode": "e6bd",
+      "unicode_decimal": 59069
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+	"index.html": {
+		"resources": [
+			"imooc-chatlist.html"
+		],
+		"refer": [
+			"imooc-content.html",
+			"imooc-me.html",
+			"imooc-discover.html",
+			"imooc-chatlist.html"
+		]
+	}
+}

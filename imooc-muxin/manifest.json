@@ -104,5 +104,38 @@
         }
       }
     }
-  }
+  },
+	"dependencies": {
+		"pages": {
+			"index.html": {
+				"resources": [
+					"imooc-chatlist.html"
+				],
+				"refer": [
+					"imooc-content.html",
+					"imooc-me.html",
+					"imooc-discover.html"
+				],
+				"priority": 0
+			}
+		},
+		"idle": {
+			"resources": [
+				"fonticon/demo.css",
+				"fonts/mui.ttf",
+				"css/mui.css",
+				"fonticon/iconfont.woff2",
+				"css/header.css",
+				"fonticon/iconfont.js",
+				"fonticon/iconfont.css",
+				"js/mui.min.js",
+				"css/mui.min.css",
+				"fonticon/iconfont.woff",
+				"fonticon/iconfont.ttf",
+				"js/mui.js",
+				"fonticon/demo_index.html",
+				"fonticon/iconfont.json"
+			]
+		}
+	}
 }
