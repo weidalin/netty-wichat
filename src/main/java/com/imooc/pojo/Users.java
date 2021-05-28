@@ -20,6 +20,20 @@ public class Users {
 
     private String qrcode;
 
+    @Override
+    public String toString() {
+        return "Users{" +
+                "id='" + id + '\'' +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", faceImage='" + faceImage + '\'' +
+                ", faceImageBig='" + faceImageBig + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", qrcode='" + qrcode + '\'' +
+                ", cid='" + cid + '\'' +
+                '}';
+    }
+
     private String cid;
 
     /**
