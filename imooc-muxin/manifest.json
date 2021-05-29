@@ -128,7 +128,8 @@
 			"imooc-me.html": {
 				"resources": [],
 				"refer": [
-					"myface.html"
+					"myface.html",
+					"mynickname.html"
 				],
 				"priority": 0
 			},

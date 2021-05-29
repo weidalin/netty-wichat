@@ -49,15 +49,12 @@
 		<script type="text/javascript">
 			mui.init()
 			mui.plusReady(function(){
-				var user = app.getUserGlobalInfo();
-				var img_myface = document.getElementById("img_myface");
-				if (user != null) {
-					var faceImage = user.faceImage;
-					if(app.isNotNull(faceImage)){
-						
-						img_myface.src = app.imgServerUrl + faceImage;
-					}
-				}
+				refreshFace();
+				// 添加自定义事件，刷新头像
+				window.addEventListener("refresh", function(){
+					refreshFace();
+				});
+				
 				//获取手机端可见屏幕的宽度
 				var imgWidth = document.body.clientWidth;
 				console.log("imgWidth" + imgWidth);
@@ -72,17 +69,56 @@
 				//绑定选择照片的菜单按钮
 				var link_choosePhoto = document.getElementById("link_choosePhoto");
 				link_choosePhoto.addEventListener("tap", function(){
-					mui.openWindow("plugin/v3.1.6/myface-uploader.html", "myface-uploader.html");
+					mui.openWindow({
+						url: "plugin/v3.1.6/myface-uploader.html",
+						id: "myface-uploader.html",
+						createNew: true});
 					mui("#sheet_myface").popover("toggle");
 				});
 				
 				//绑定下载照片的菜单按钮
 				var link_savePhoto = document.getElementById("link_savePhoto");
 				link_savePhoto.addEventListener("tap", function(){
-					alert("baocun");
+					plus.nativeUI.showWaiting("下载中...");
+					var user = app.getUserGlobalInfo();
+					var faceImgBig = user.faceImageBig;
+					
+//					var dtast = plus.downloader.createDownload(
+					var dtask = plus.downloader.createDownload(
+						app.imgServerUrl + faceImgBig,
+						{},
+						function(downloadFile, status){
+							plus.nativeUI.closeWaiting();
+							if( status == 200){
+								var tempFile = downloadFile.filename;
+								
+								//通过相册api保存照片到本地相册
+								 plus.gallery.save( tempFile, function () {
+									app.showToast( "保存图片到相册成功", "success");
+								} );
+							}else{
+								app.showToast("下载错误...", "error");
+								console.log("下载错误...");
+							}
+							
+						}
+						
+					);
+					dtask.start(); //启动下载任务
 				});
-				
 			});
+			
+			function refreshFace(){
+				var user = app.getUserGlobalInfo();
+				var img_myface = document.getElementById("img_myface");
+				if (user != null) {
+					var faceImageBig = user.faceImageBig;
+					if(app.isNotNull(faceImageBig)){
+						
+						img_myface.src = app.imgServerUrl + faceImageBig;
+					}
+				}
+			};
 		</script>
 	</body>
 

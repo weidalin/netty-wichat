@@ -21,9 +21,23 @@ public interface UserService {
 
     /**@]
      *
-     * @param user
+     * @param user 用户注册
      * @return
      */
     public Users saveUser(Users user);
+
+    /**@]
+     *
+     * @param user 修改用户记录
+     * @return
+     */
+    public Users updateUserInfo(Users user);
+
+    /**@]
+     *
+     * @  查询用户信息
+     * @return
+     */
+    public Users queryUserById(String userId);
 
 }

@@ -29,16 +29,6 @@ public class UserServiceImpl implements UserService {
         return result != null ? true : false;
     }
 
-    @Override
-    public Users saveUser(Users user) {
-        String userId =  sid.nextShort();
-
-        //TODO 为每个用户生成一个唯一的二维码
-        user.setQrcode("");
-        user.setId(userId);
-        usersMapper.insert(user);
-        return user;
-    }
 
     @Transactional(propagation = Propagation.SUPPORTS) //事务
     @Override
@@ -50,5 +40,32 @@ public class UserServiceImpl implements UserService {
 
         Users result = usersMapper.selectOneByExample(userExample);
         return result;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED) //事务
+    @Override
+    public Users saveUser(Users user) {
+        String userId =  sid.nextShort();
+
+        //TODO 为每个用户生成一个唯一的二维码
+        //TODO 为每个用户生成一个唯一的二维码
+        user.setQrcode("");
+        user.setId(userId);
+        usersMapper.insert(user);
+        return user;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED) //事务
+    @Override
+    public Users updateUserInfo(Users user) {
+        usersMapper.updateByPrimaryKeySelective(user); //user中为空的属性不去更新， 不会使用null覆盖原有的值
+//        usersMapper.updateByPrimaryKey(user); user必须包含主键，根据主键，所有属性都将去更新，会使用null覆盖原有的值
+        return queryUserById(user.getId());
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS) //事务
+    @Override
+    public Users queryUserById(String userId) {
+        return usersMapper.selectByPrimaryKey(userId);
     }
 }

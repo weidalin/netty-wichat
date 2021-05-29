@@ -98,27 +98,33 @@
 							timeout:10000,//超时时间设置为10秒；
 							headers:{'Content-Type':'application/json'},	              
 							success:function(data){
-								
-								// 关闭等待框
+								//关闭等待框
 								plus.nativeUI.closeWaiting();
-								
-								if (data.status == 200) {
+
+								if(data.status == 200){
 									var userInfo = data.data;
 									app.setUserGlobalInfo(userInfo);
 									
-									// 触发另外一个webview的自定义事件，可以使用 mui.fire()
+									//触发另外一个webview的自定义事件，可以使用mui.fire()
 									var imooc_meWebview = plus.webview.getWebviewById("imooc-me.html");
 									mui.fire(imooc_meWebview, "refresh");
 									
-									// 触发另外一个webview的自定义事件，可以使用 mui.fire()
-									var myfaceWebview = plus.webview.getWebviewById("myface.html");
-									mui.fire(myfaceWebview, "refresh");
+									//触发另外一个webview的自定义事件，可以使用mui.fire()
+									var imooc_meWebview = plus.webview.getWebviewById("myface.html");
+									mui.fire(imooc_meWebview, "refresh");
 									
-									// 页面跳转
+									
+									//页面跳转
 									mui.openWindow("index.html", "index.html");
-								} else {
+								}else{
 									app.showToast(data.msg, "error");
 								}
+								
+							},
+							error:function(xhr,type,errorThrown){
+								app.showToast(type, "error");
+								//异常处理；
+								console.log(type);
 							}
 						});
 					}
