@@ -45,7 +45,7 @@
 		            </a>
 		        </li>
 		        <li class="mui-table-view-cell mui-media">
-		            <a href="javascript:;">
+		            <a id="link_myqrcode" href="javascript:;">
 		            	<span class = "mui-pull-right mui-icon mui-icon-arrowright"
 		            		style="line-height: 42px;color: lightgray;margin-left: 3px;"></span>
 		                <img class="mui-media-object mui-pull-right" src="image/qrcode.png" 
@@ -62,7 +62,7 @@
 		    <ul class="mui-table-view">
 		    	<li class="mui-table-view-cell mui-media"
 		    		style="text-align: center;">
-		            <a href="javascript:;">
+		            <a  id="link_logout" href="javascript:;">
 		                <div class="mui-media-body">
 		                    退出登录
 
@@ -85,7 +85,6 @@
 				var meWebview = plus.webview.currentWebview();
 				meWebview.addEventListener("show", function(){
 					refreshUserInfo();
-					
 				});
 				
 				//页面跳转，我的头像
@@ -99,6 +98,21 @@
 				link_nickname.addEventListener("tap", function(){
 					mui.openWindow("mynickname.html", "mynickname.html")
 				});
+				
+				//页面跳转，我的二维码
+				var link_myqrcode = document.getElementById("link_myqrcode");
+				link_myqrcode.addEventListener("tap", function(){
+					mui.openWindow("myqrcode.html", "myqrcode.html");
+				})
+				
+				link_logout
+				//用户退出
+				var link_logout = document.getElementById("link_logout");
+				link_logout.addEventListener("tap", function(){
+					app.userLogout();
+					mui.openWindow("login.html", "login.html");
+				});
+				
 				
 				// 添加自定义事件，刷新头像
 				window.addEventListener("refresh", function(){

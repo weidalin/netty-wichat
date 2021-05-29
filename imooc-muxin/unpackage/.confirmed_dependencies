@@ -18,7 +18,9 @@
 	"imooc-me.html": {
 		"refer": [
 			"myface.html",
-			"mynickname.html"
+			"mynickname.html",
+			"myqrcode.html",
+			"login.html"
 		]
 	},
 	"myface.html": {

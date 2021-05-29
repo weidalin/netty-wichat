@@ -129,7 +129,9 @@
 				"resources": [],
 				"refer": [
 					"myface.html",
-					"mynickname.html"
+					"mynickname.html",
+					"myqrcode.html",
+					"login.html"
 				],
 				"priority": 0
 			},

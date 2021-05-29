@@ -1,0 +1,140 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="css/header.css" />
+		<style>
+			
+			#mui-content {
+				width: 100%;
+				position: absolute;
+				top: 44px;
+				bottom: 0px;
+				background: #2e3132;
+			}
+			
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav title">
+		    <a class="mui-action-back mui-icon 
+		    	mui-icon-left-nav mui-pull-left" 
+		    	style="color: white;"></a>
+		    	
+		    	<a id="linx_download_qrcode" class="mui-pull-right" style="font-size: 15px;
+		    		color: white;line-height: 44px;">
+		    	<a id="linx_download_qrcode" class="mui-pull-right" style="font-size: 15px;color: white;line-height: 44px;">
+				<img src="image/download.png" width="20px"/>
+			</a>
+	    	
+		    <h1 class="mui-title title-color">我的二维码</h1>
+
+
+		</header>
+		
+		
+	                	
+		<div id="mui-content" style="padding: 80px 30px 0px 30px;">
+			<div style="background-color: white;padding-top: 20px;padding-left: 20px;">
+				<img id="img_myface" src="" width="60px" style="border-radius: 8%;float: left;"/>
+				<label id="lab_nickname" style="float: left;margin-left: 10px;margin-top: 10px;">风间影月</label>
+			</div>
+			<div style="background-color: white;text-align: center;">
+		    	<img id="img_myqrcode" src="" />
+		    </div>
+		    <div style="background-color: white;text-align: center;">
+		    	<p style="padding-bottom: 10px;font-size: 12px;">扫一扫上面的二维码图案，加我慕信~</p>
+		    </div>
+			    
+		</div>
+		
+
+		
+		<script src="js/mui.min.js"></script>
+		<script src="js/app.js"></script>
+		<script type="text/javascript">
+			mui.init()
+			mui.plusReady(function(){
+				refreshFace_qrCode();
+				// 添加自定义事件，刷新头像
+				window.addEventListener("refresh", function(){
+					refreshFace_qrCode();
+				});
+				
+
+				// 获取手机端可见屏幕宽度
+				var imgWidth = document.body.clientWidth-60;
+				img_my_qrcode.width=imgWidth;
+				img_my_qrcode.height=imgWidth;
+				
+				//绑定下载照片的菜单按钮
+				var link_saveQRCode = document.getElementById("link_saveQRCode");
+				link_saveQRCode.addEventListener("tap", function(){
+					plus.nativeUI.showWaiting("下载中...");
+					var user = app.getUserGlobalInfo();
+					var qrcode = user.qrcode;
+					
+//					var dtast = plus.downloader.createDownload(
+					var dtask = plus.downloader.createDownload(
+						app.imgServerUrl + qrcode,
+						{},
+						function(downloadFile, status){
+							plus.nativeUI.closeWaiting();
+							if( status == 200){
+								var tempFile = downloadFile.filename;
+								
+								//通过相册api保存照片到本地相册
+								 plus.gallery.save( tempFile, function () {
+									app.showToast( "保存二维码到相册成功", "success");
+								} );
+							}else{
+								app.showToast("下载错误...", "error");
+								console.log("下载错误...");
+							}
+							
+						}
+						
+					);
+					dtask.start(); //启动下载任务
+				});
+			});
+			
+			function refreshFace_qrCode(){
+				var user = app.getUserGlobalInfo();
+				var img_myqrcode = document.getElementById("img_myqrcode");
+				if (user != null) {
+					//设置qrcode
+					var qrcode = user.qrcode;
+					if(app.isNotNull(qrcode)){
+						img_myqrcode.src = app.imgServerUrl + qrcode;
+					}
+					
+					// 获取手机端可见屏幕宽度
+					var imgWidth = document.body.clientWidth-60;
+					img_myqrcode.width=imgWidth;
+					img_myqrcode.height=imgWidth;
+					
+					//设置小头像
+					var img_myface = document.getElementById("img_myface");
+					var faceImage = user.faceImage;
+					if(app.isNotNull(faceImage)){
+						img_myface.src = app.imgServerUrl + faceImage;
+					}
+					
+					var lab_nickname = document.getElementById("lab_nickname");
+					var nickname = user.nickname;
+					if(app.isNotNull(nickname)){
+						lab_nickname.innerHTML = nickname;
+					}
+				}
+				
+			};
+		</script>
+	</body>
+
+</html>

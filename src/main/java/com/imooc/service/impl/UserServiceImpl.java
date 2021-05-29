@@ -3,13 +3,19 @@ package com.imooc.service.impl;
 import com.imooc.mapper.UsersMapper;
 import com.imooc.pojo.Users;
 import com.imooc.service.UserService;
+import com.imooc.utils.FastDFSClient;
+import com.imooc.utils.FileUtils;
+import com.imooc.utils.QRCodeUtils;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.mapper.entity.Example.Criteria;
+
+import java.io.IOException;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -18,6 +24,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private Sid sid;
+
+    @Autowired
+    private QRCodeUtils qrCodeUtils;
+
+    @Autowired
+    private FastDFSClient fastDFSClient;
 
     @Transactional(propagation = Propagation.SUPPORTS) //事务
     @Override
@@ -47,9 +59,19 @@ public class UserServiceImpl implements UserService {
     public Users saveUser(Users user) {
         String userId =  sid.nextShort();
 
-        //TODO 为每个用户生成一个唯一的二维码
-        //TODO 为每个用户生成一个唯一的二维码
-        user.setQrcode("");
+        //为每个用户生成一个唯一的二维码
+        //wixin_qrcode:[username]
+        String qrCodePath = "D://uploadtmp/user" + userId + "qrcode.png";
+        qrCodeUtils.createQRCode(qrCodePath, "wixin_qrcode:"+user.getUsername());
+        MultipartFile qrCodeFile = FileUtils.fileToMultipart(qrCodePath);
+        String qrCodeUrl = "";
+        try {
+            qrCodeUrl = fastDFSClient.uploadQRCode(qrCodeFile);
+        } catch(IOException e){
+            e.printStackTrace();
+        }
+
+        user.setQrcode(qrCodeUrl);
         user.setId(userId);
         usersMapper.insert(user);
         return user;
