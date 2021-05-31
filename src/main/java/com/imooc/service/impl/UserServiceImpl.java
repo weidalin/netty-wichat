@@ -1,7 +1,15 @@
 package com.imooc.service.impl;
 
+import com.imooc.enums.SearchFriendsStatusEnum;
+import com.imooc.mapper.FriendsRequestMapper;
+import com.imooc.mapper.MyFriendsMapper;
 import com.imooc.mapper.UsersMapper;
+import com.imooc.mapper.UsersMapperCustom;
+import com.imooc.pojo.FriendsRequest;
+import com.imooc.pojo.MyFriends;
 import com.imooc.pojo.Users;
+import com.imooc.pojo.vo.FriendRequestVO;
+import com.imooc.pojo.vo.MyFriendsVO;
 import com.imooc.service.UserService;
 import com.imooc.utils.FastDFSClient;
 import com.imooc.utils.FileUtils;
@@ -16,11 +24,22 @@ import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.mapper.entity.Example.Criteria;
 
 import java.io.IOException;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
     private UsersMapper usersMapper;
+
+    @Autowired
+    private UsersMapperCustom usersMapperCustom;
+
+    @Autowired
+    private MyFriendsMapper myFriendsMapper;
+
+    @Autowired
+    private FriendsRequestMapper friendsRequestMapper;
 
     @Autowired
     private Sid sid;
@@ -89,5 +108,104 @@ public class UserServiceImpl implements UserService {
     @Override
     public Users queryUserById(String userId) {
         return usersMapper.selectByPrimaryKey(userId);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS) //事务
+    @Override
+    public Integer preconditionSearchFriends(String myUserId, String friendUsername) {
+        //1.搜索的用户如果不存在，返回【无用户】
+        Users user = queryUserInfoByUsername(friendUsername);
+        if(user == null){
+            return SearchFriendsStatusEnum.USER_NOT_EXIST.status;
+        }
+        //2.搜索的用户是自己，返回【不能添加自己】
+        if(user.getId().equals(myUserId)){
+            return SearchFriendsStatusEnum.NOT_YOURSELF.status;
+        }
+        //3.搜索的用户已经是你的好友，返回【该用户已经是你的好友】
+        Example mfe  = new Example(MyFriends.class);
+        Criteria myc = mfe.createCriteria();
+        myc.andEqualTo("myUserId", myUserId);
+        myc.andEqualTo("myFriendUserId", user.getId());
+        MyFriends myFriendsRel = myFriendsMapper.selectOneByExample(mfe);
+        if(myFriendsRel != null){
+            return SearchFriendsStatusEnum.ALREADY_FRIENDS.status;
+        }
+        return SearchFriendsStatusEnum.SUCCESS.status;
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS) //事务
+    @Override
+    public Users queryUserInfoByUsername(String username){
+        Example ue  = new Example(Users.class);
+        Criteria uc = ue.createCriteria();
+        uc.andEqualTo("username", username);
+        return usersMapper.selectOneByExample(ue);
+    }
+
+
+    @Override
+    public void sendFriendRequest(String myUserId, String friendUsername) {
+        //根据用户名把朋友信息查询出来
+        Users friend = queryUserInfoByUsername(friendUsername);
+        //1.查询发送好友请求记录表
+        Example fre = new Example(FriendsRequest.class);
+        Criteria frc = fre.createCriteria();
+        frc.andEqualTo("sendUserId", myUserId);
+        frc.andEqualTo("acceptUserId", friend.getId());
+        FriendsRequest friendsRequest = friendsRequestMapper.selectOneByExample(fre);
+        if(friendsRequest == null){
+            //如果不是你的好友，并且好友记录没有添加，则新增好友记录
+            String requestId = sid.nextShort();
+            FriendsRequest request = new FriendsRequest();
+            request.setId(requestId);
+            request.setSendUserId(myUserId);
+            request.setAcceptUserId(friend.getId());
+            request.setRequestDataTime(new Date());
+            friendsRequestMapper.insert(request);
+        }
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS) //事务
+    @Override
+    public List<FriendRequestVO> queryFriendRequestList(String acceptUserId) {
+        return usersMapperCustom.queryFriendRequestList(acceptUserId);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS) //事务
+    @Override
+    public void deleteFriendRequest(String sendUserId, String acceptUserId) {
+        Example fre = new Example(FriendsRequest.class);
+        Criteria frc = fre.createCriteria();
+        frc.andEqualTo("sendUserId", sendUserId);
+        frc.andEqualTo("acceptUserId", acceptUserId);
+        friendsRequestMapper.deleteByExample(fre);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED) //事务
+    @Override
+    public void passFriendRequest(String sendUserId, String acceptUserId) {
+        saveFriends(sendUserId, acceptUserId);
+        saveFriends(acceptUserId, sendUserId);
+        deleteFriendRequest(sendUserId, acceptUserId);
+
+    }
+    @Transactional(propagation = Propagation.REQUIRED) //事务
+    private void saveFriends(String sendUserId, String acceptUserId){
+        MyFriends myFriends = new MyFriends();
+        String recordId = sid.nextShort();
+        myFriends.setId(recordId);
+        myFriends.setMyFriendUserId(acceptUserId);
+        myFriends.setMyUserId(sendUserId);
+        myFriendsMapper.insert(myFriends);
+
+    }
+
+
+    @Transactional(propagation = Propagation.REQUIRED) //事务
+    @Override
+    public List<MyFriendsVO> queryMyFriends(String userId) {
+        List<MyFriendsVO> myFriends = usersMapperCustom.queryMyFriends(userId);
+        return myFriends;
     }
 }

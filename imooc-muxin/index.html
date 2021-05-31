@@ -93,8 +93,26 @@
     					plus.webview.hide(muxinArray[i].pageId, "fade-out")
     				}
     			}
-    		})    		
+    		});
+    		
+    		// 延时加载
+			setTimeout("initData()", "1000");
+    		setTimeout("initData()", "1000");
+    		
+    		// 添加自定义事件，刷新头像
+			window.addEventListener("refresh", function(){
+				refreshUserInfo();
+			});
+				
     	})
+    	//预加载
+		function initData(){
+			var imooc_chatlist = plus.webview.getWebviewById("imooc-chatlist.html");
+			mui.fire(imooc_chatlist, "refresh");
+			
+			var imooc_me = plus.webview.getWebviewById("imooc-me.html");
+			mui.fire(imooc_me, "refresh");
+		};
     </script>
 </body>
 </html>

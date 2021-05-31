@@ -24,8 +24,7 @@
 		    <br />
 		    
 		    <ul class="mui-table-view">
-		        <li class="mui-table-view-cell mui-media">
-
+		        <li id="li_add_friends" class="mui-table-view-cell mui-media">
 		                <img class="mui-media-object mui-pull-left" 
 		                	src="image/addfriends.png" style="max-width: 24px;max-height: 24px ;">
 		                    <p class="mui-ellipsis"
@@ -35,7 +34,7 @@
 		        </li>
 		    </ul>
 		    <ul class="mui-table-view">
-		        <li class="mui-table-view-cell mui-media">
+		        <li id="li_scanme" class="mui-table-view-cell mui-media">
 
 		                <img class="mui-media-object mui-pull-left" 
 		                	src="image/scanscan.png" style="max-width: 24px;max-height: 24px ;">
@@ -52,6 +51,16 @@
 		<script src="js/mui.min.js"></script>
 		<script type="text/javascript">
 			mui.init()
+			mui.plusReady(function(){
+				var li_add_friends = document.getElementById("li_add_friends");
+				li_add_friends.addEventListener("tap", function(){
+					mui.openWindow("searchFriends.html", "searchFriends.html")
+				});
+				var li_scanme = document.getElementById("li_scanme");
+				li_scanme.addEventListener("tap", function(){
+					mui.openWindow("scanme.html", "scanme.html")
+				});
+			});
 		</script>
 	</body>
 

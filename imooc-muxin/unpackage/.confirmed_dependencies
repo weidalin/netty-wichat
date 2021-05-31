@@ -1,7 +1,10 @@
 {
 	"index.html": {
 		"resources": [
-			"imooc-chatlist.html"
+			"imooc-chatlist.html",
+			"fonticon/iconfont.css",
+			"css/mui.min.css",
+			"css/header.css"
 		],
 		"refer": [
 			"imooc-content.html",
@@ -13,6 +16,11 @@
 	"login.html": {
 		"refer": [
 			"index.html"
+		],
+		"resources": [
+			"css/registLogin/weida.jpg",
+			"css/registLogin/util.css",
+			"css/registLogin/main.css"
 		]
 	},
 	"imooc-me.html": {
@@ -21,11 +29,44 @@
 			"mynickname.html",
 			"myqrcode.html",
 			"login.html"
+		],
+		"resources": [
+			"css/registLogin/weida.jpg",
+			"css/mui.min.css",
+			"image/qrcode.png"
 		]
 	},
 	"myface.html": {
 		"refer": [
 			"plugin/v3.1.6/myface-uploader.html"
+		]
+	},
+	"imooc-discover.html": {
+		"refer": [
+			"searchFriends.html",
+			"scanme.html"
+		],
+		"resources": [
+			"image/friends.png",
+			"css/mui.min.css",
+			"image/scanscan.png",
+			"image/addfriends.png"
+		]
+	},
+	"searchFriends.html": {
+		"refer": [
+			"searchFriendsResult.html"
+		]
+	},
+	"imooc-content.html": {
+		"resources": [
+			"css/mui.min.css",
+			"css/mui.indexedlist.css"
+		]
+	},
+	"imooc-chatlist.html": {
+		"resources": [
+			"css/mui.min.css"
 		]
 	}
 }

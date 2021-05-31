@@ -1,6 +1,10 @@
 package com.imooc.service;
 
 import com.imooc.pojo.Users;
+import com.imooc.pojo.vo.FriendRequestVO;
+import com.imooc.pojo.vo.MyFriendsVO;
+
+import java.util.List;
 
 public interface UserService {
     /**
@@ -40,4 +44,62 @@ public interface UserService {
      */
     public Users queryUserById(String userId);
 
+    /**@]
+     *
+     * @  搜索朋友的前置条件
+     * @return
+     */
+    public Integer preconditionSearchFriends(String myUserId,
+                                             String friendUsername);
+
+
+
+    /**@]
+     *
+     * @  搜索朋友的前置条件
+     * @return
+     */
+    public Users queryUserInfoByUsername(String username);
+
+
+    /**
+     *
+     * @  添加好友请求记录，保存到数据库
+     * @return
+     */
+    public void sendFriendRequest(String myUserId, String friendUsername);
+
+    /**
+     *
+     * @  发送添加好友记录
+     * @return
+     */
+    public List<FriendRequestVO> queryFriendRequestList(String acceptUserId);
+
+    /**
+     *
+     * @  删除请求添加好友记录
+     * @return
+     */
+    public void deleteFriendRequest(String sendUserId, String acceptUserId);
+
+    /**
+     *
+     * @Description  通过好友请求
+     * 1.保存好友
+     * 2.逆向保存好友
+     * 3.删除请求添加好友记录
+     * @return
+     */
+    public void passFriendRequest(String sendUserId, String acceptUserId);
+
+    /**
+     *
+     * @Description  查询好友列表
+     * 1.保存好友
+     * 2.逆向保存好友
+     * 3.删除请求添加好友记录
+     * @return
+     */
+    public List<MyFriendsVO> queryMyFriends(String userId);
 }
