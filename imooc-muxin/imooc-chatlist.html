@@ -42,7 +42,7 @@
 			</ul>
 			
 			<ul id="ul_chatSnapshot" class="mui-table-view">
-				<!--<li class="mui-table-view-cell mui-media">
+				<li class="mui-table-view-cell mui-media">
 					<div class="mui-slider-right mui-disabled">
 						<a class="mui-btn mui-btn-red">删除</a>
 					</div>
@@ -51,7 +51,7 @@
 			            	<span class="red-point">慕课网</span>
 			            <p class="mui-ellipsis">这里是聊天内容...</p>
 		            </div>
-			    </li>-->
+			    </li>
 			   <!-- <li class="mui-table-view-cell mui-media">
 		            <div class="mui-media-body">
 			            <img class="mui-media-object mui-pull-left" src="image/face-default-cat.png"/>
@@ -101,7 +101,59 @@
 				thisWebview.addEventListener("show", function(){
 					loadingFriendRequests();
 				});
+				
+				// 添加自定义事件，刷新好友请求记录，初始化websocket
+				thisWebview.addEventListener("refresh", function(){
+					loadingFriendRequests();
+					CHAT.init();
+				});
+				CHAT.init();
+				
+				
+				
+				
 			});
+			
+			// 构建聊天业务CHAT
+			window.CHAT = {
+				socket: null,
+				init: function() {
+					if (window.WebSocket) {
+						//如果当前状态已经链接，那就不要重复初始化websocket
+						if(CHAT.socket != null
+							&& CHAT.socket != undefined
+							&& CHAT.socket.readyState == WebSocket.OPEN){
+								return false;
+							}
+						CHAT.socket = new WebSocket(app.nettyServerUrl);
+						CHAT.socket.onopen = CHAT.wsopen,
+						CHAT.socket.onclose = CHAT.wsclose,
+						CHAT.socket.onerror = CHAT.wserror,
+						CHAT.socket.onmessage = CHAT.wsmessage
+					} else {
+						alert("手机设备过旧不支持websocket协议...");
+					}
+				},
+				chat: function(msg) {
+					console.log("chat msg: " + msg);
+					CHAT.socket.send(msg);
+				},
+				wsopen: function(){
+					console.log("websocket链接已经建立")
+				},
+				wsclose: function() {
+					console.log("连接关闭...");
+				},
+				wserror: function() {
+					console.log("发生错误...");
+				}, 
+				wsmessage: function(e) {
+					console.log("接受到消息：" + e.data);
+//					var receiveMsg = document.getElementById("receiveMsg");
+//					var html = receiveMsg.innerHTML;
+//					receiveMsg.innerHTML = html + "<br/>" + e.data;
+				}
+			};
 				
 			
 			// 加载好友请求记录列表
@@ -171,6 +223,8 @@
 					headers:{'Content-Type':'application/json'},	              
 					success:function(data){
 						// TODO 通讯录
+						var myFriendList = data.data;
+						app.setContactList(myFriendList());
 						//重新加载好友请求记录
 						loadingFriendRequests();
 

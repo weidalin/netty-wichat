@@ -10,7 +10,8 @@
 			"imooc-content.html",
 			"imooc-me.html",
 			"imooc-discover.html",
-			"imooc-chatlist.html"
+			"imooc-chatlist.html",
+			"imooc-contact.html"
 		]
 	},
 	"login.html": {
@@ -67,6 +68,11 @@
 	"imooc-chatlist.html": {
 		"resources": [
 			"css/mui.min.css"
+		]
+	},
+	"imooc-contact.html": {
+		"refer": [
+			"chatting.html"
 		]
 	}
 }

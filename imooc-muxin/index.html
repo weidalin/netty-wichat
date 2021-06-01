@@ -18,7 +18,7 @@
 </head>
 <body>
 	<header class="mui-bar mui-bar-nav title">
-	    <h1 class="mui-title title-color">wi信</h1>
+	    <h1 class="mui-title title-color" id="wixin_title">wi信</h1>
 
 	</header>
 	<nav class="mui-bar mui-bar-tab">
@@ -46,8 +46,8 @@
 	    		pageId: "imooc-chatlist.html", 
 	    		pageUrl: "imooc-chatlist.html"
 	    	},{
-	    		pageId: "imooc-content.html", 
-	    		pageUrl: "imooc-content.html"
+	    		pageId: "imooc-contact.html", 
+	    		pageUrl: "imooc-contact.html"
 	    	},{
 	    		pageId: "imooc-discover.html", 
 	    		pageUrl: "imooc-discover.html"
@@ -66,6 +66,7 @@
     		mui.back = function(){
     			return false;
     		}
+    		netChangeSwitch();
     		
     		//获取当前的webview对象
     		var indexWebview = plus.webview.currentWebview()
@@ -104,7 +105,7 @@
 				refreshUserInfo();
 			});
 				
-    	})
+    	});
     	//预加载
 		function initData(){
 			var imooc_chatlist = plus.webview.getWebviewById("imooc-chatlist.html");
@@ -113,6 +114,25 @@
 			var imooc_me = plus.webview.getWebviewById("imooc-me.html");
 			mui.fire(imooc_me, "refresh");
 		};
+		
+		// 对网络连接进行事件监听
+		function netChangeSwitch(){
+			document.addEventListener("netchange", function(){
+				// 获取、判断网络的状态
+				var connectionStatus = plus.networkinfo.getCurrentType();				
+				if(connectionStatus != 0 && connectionStatus != 1){
+					console.log("connectionStatus12312312312");
+					// 网络连接已打开
+					var wixin_title = document.getElementById("wixin_title");
+					wixin_title.innerHTML = "<b>wi信</b>";
+				}else{
+					// 关闭网络连接
+					var wixin_title = document.getElementById("wixin_title");
+					wixin_title.innerHTML = "<b>wi信(未连接)</b>";
+				}
+			});
+		};
+		
     </script>
 </body>
 </html>
