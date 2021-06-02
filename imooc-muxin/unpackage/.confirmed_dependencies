@@ -68,6 +68,9 @@
 	"imooc-chatlist.html": {
 		"resources": [
 			"css/mui.min.css"
+		],
+		"refer": [
+			"chatting.html"
 		]
 	},
 	"imooc-contact.html": {

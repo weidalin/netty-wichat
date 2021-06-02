@@ -186,7 +186,9 @@
 				"resources": [
 					"css/mui.min.css"
 				],
-				"refer": [],
+				"refer": [
+					"chatting.html"
+				],
 				"priority": 0
 			},
 			"imooc-contact.html": {

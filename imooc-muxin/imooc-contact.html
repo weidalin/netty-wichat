@@ -102,7 +102,7 @@
 					success:function(data){
 						// 通讯录
 						if(data.status == 200){
-							console.log("data.data: " + JSON.stringify(data.data));
+//							console.log("data.data: " + JSON.stringify(data.data));
 							app.setContactList(data.data);
 						}
 
@@ -164,7 +164,7 @@
 				for(var i=0; i<friendList.length; i++){
 					var friend = friendList[i];
 					
-					console.log("friend: " + JSON.stringify(friend));
+//					console.log("friend: " + JSON.stringify(friend));
 					// 2.1 转换拼音
 					var pingyin = words.convertPinyin(friend.friendNickname);
 					// 2.2截取拼音的首字母
@@ -183,9 +183,12 @@
 						contactHtml += '<li data-group="' + nicknameStarter + '" class="mui-table-view-divider mui-indexed-list-group">' + nicknameStarter + '</li>';
 						for (var j = 0 ; j < friendArray.length ; j ++ ) {
 							contactHtml += '' +
-										'<li friendUserId="' + friendArray[j].friendUserId + '" friendNickname="' + friendArray[j].friendNickname + '" friendFaceImage="' + friendArray[j].friendFaceImage + '" class="chat-with-friend mui-media mui-table-view-cell mui-indexed-list-item" style="padding: 8px 10px;">' +
-											'<img class="mui-media-object mui-pull-left" style="max-width: 35px;height: 35px;" src="' + app.imgServerUrl + friendArray[j].friendFaceImage + '"/>' +
-											'<div class="mui-media-body" style="line-height: 35px;">' + friendArray[j].friendNickname + '</div>' +
+										'<li friendUserId="' + friendArray[j].friendId + '" friendNickname="' 
+										+ friendArray[j].friendNickname + '" friendFaceImage="' + friendArray[j].friendFaceImage 
+										+ '" class="chat-with-friend mui-media mui-table-view-cell mui-indexed-list-item" style="padding: 8px 10px;">' 
+											+ '<img class="mui-media-object mui-pull-left" style="max-width: 35px;height: 35px;" src="' + app.imgServerUrl 
+											+ friendArray[j].friendFaceImage + '"/>' +
+												'<div class="mui-media-body" style="line-height: 35px;">' + friendArray[j].friendNickname + '</div>' +
 										'</li>';
 						}
 					}
@@ -205,7 +208,7 @@
 					mui.openWindow({
 						url:"chatting.html", 
 						//每个朋友的聊天id都是唯一的
-						id: "chatting_" + friendUserId,
+						id: "chatting-" + friendUserId,
 						extras:{
 							friendUserId : friendUserId,
 							friendNickname : friendNickname,

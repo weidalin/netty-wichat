@@ -1,10 +1,9 @@
 package com.imooc.service.impl;
 
+import com.imooc.enums.MsgActionEnum;
+import com.imooc.enums.MsgSignFlagEnum;
 import com.imooc.enums.SearchFriendsStatusEnum;
-import com.imooc.mapper.FriendsRequestMapper;
-import com.imooc.mapper.MyFriendsMapper;
-import com.imooc.mapper.UsersMapper;
-import com.imooc.mapper.UsersMapperCustom;
+import com.imooc.mapper.*;
 import com.imooc.pojo.FriendsRequest;
 import com.imooc.pojo.MyFriends;
 import com.imooc.pojo.Users;
@@ -13,7 +12,13 @@ import com.imooc.pojo.vo.MyFriendsVO;
 import com.imooc.service.UserService;
 import com.imooc.utils.FastDFSClient;
 import com.imooc.utils.FileUtils;
+import com.imooc.utils.JsonUtils;
 import com.imooc.utils.QRCodeUtils;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import netty.ChatMsg;
+import netty.DataContent;
+import netty.UserChannelRel;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,6 +45,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private FriendsRequestMapper friendsRequestMapper;
+
+    @Autowired
+    private ChatMsgMapper chatMsgMapper;
 
     @Autowired
     private Sid sid;
@@ -189,6 +197,16 @@ public class UserServiceImpl implements UserService {
         saveFriends(acceptUserId, sendUserId);
         deleteFriendRequest(sendUserId, acceptUserId);
 
+        Channel sendChannel = UserChannelRel.get(sendUserId);
+        if(sendChannel != null){
+            // 使用websocket主动推送消息到请求发起者，更新他的通讯录列表为最新
+            DataContent dataContent = new DataContent();
+            dataContent.setAction(MsgActionEnum.PULL_FRIEND.type);
+            sendChannel.writeAndFlush(
+                    new TextWebSocketFrame(
+                            JsonUtils.objectToJson(dataContent)));
+        }
+
     }
     @Transactional(propagation = Propagation.REQUIRED) //事务
     private void saveFriends(String sendUserId, String acceptUserId){
@@ -207,5 +225,38 @@ public class UserServiceImpl implements UserService {
     public List<MyFriendsVO> queryMyFriends(String userId) {
         List<MyFriendsVO> myFriends = usersMapperCustom.queryMyFriends(userId);
         return myFriends;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED) //事务
+    @Override
+    public String saveMsg(ChatMsg chatMsg) {
+        com.imooc.pojo.ChatMsg msgDB = new com.imooc.pojo.ChatMsg();
+        String msgId  = sid.nextShort();
+        msgDB.setId(msgId);
+        msgDB.setAcceptUserId(chatMsg.getReceiverId());
+        msgDB.setSendUserId(chatMsg.getSenderId());
+        msgDB.setCreateTime(new Date());
+        msgDB.setSignFlag(MsgSignFlagEnum.unsign.type);
+        msgDB.setMsg(chatMsg.getMsg());
+        chatMsgMapper.insert(msgDB);
+        return msgId;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED) //事务
+    @Override
+    public String updateMsgSigned(List<String> msgIdList) {
+        usersMapperCustom.batchUpdateMsgSigned(msgIdList);
+        return null;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED) //事务
+    @Override
+    public List<com.imooc.pojo.ChatMsg> getUnReadMsgList(String acceptUserId) {
+        Example chatExample = new Example(com.imooc.pojo.ChatMsg.class);
+        Criteria chatCriteria = chatExample.createCriteria();
+        chatCriteria.andEqualTo("signFlag", 0);
+        chatCriteria.andEqualTo("acceptUserId", acceptUserId);
+        List<com.imooc.pojo.ChatMsg> result = chatMsgMapper.selectByExample(chatExample);
+        return result;
     }
 }

@@ -87,11 +87,37 @@ window.app = {
 	},
 	
 	/**
+	 *  根据用户id， 从本地的缓存（联系人列表）中获取朋友的信息
+	 * @param {Object} friendId
+	 */
+	getFriendFromContactList: function(friendId) {
+		var contactListStr =  plus.storage.getItem("contactList");
+		
+		// 判断contactListStr是否为空
+		if(this.isNotNull(contactListStr)){
+			//	不为空，则把用户信息返回
+			var contactList = JSON.parse(contactListStr);
+			for( var i = 0; i < contactList.length; i++){
+				var friend = contactList[i];
+				if(friend.friendId == friendId){
+					return friend;
+					break;
+				}
+			}
+		}else{
+			// 如果为空，直接返回null
+			return null;	
+		}
+		
+	},
+	
+	/**
 	 * 根据用户id，从本地的缓存（联系人列表）中获取朋友的信息
 	 * @param {Object} friendId
 	 */
 	getFriendFromContactList: function(friendId) {
 		var contactListStr = plus.storage.getItem("contactList");
+//		console.log("contactListStr: " + contactListStr)
 		
 		// 判断contactListStr是否为空
 		if (this.isNotNull(contactListStr)) {
@@ -99,7 +125,7 @@ window.app = {
 			var contactList = JSON.parse(contactListStr);
 			for (var i = 0 ; i < contactList.length ; i ++) {
 				var friend = contactList[i];
-				if (friend.friendUserId == friendId) {
+				if (friend.friendId == friendId) {
 					return friend;
 					break;
 				}
@@ -219,6 +245,7 @@ window.app = {
 		if (me.isNotNull(chatSnapshotListStr)) {
 			// 如果不为空
 			chatSnapshotList = JSON.parse(chatSnapshotListStr);
+			console.log("chatSnapshotList: " + JSON.stringify(chatSnapshotList));
 		} else {
 			// 如果为空，赋一个空的list
 			chatSnapshotList = [];

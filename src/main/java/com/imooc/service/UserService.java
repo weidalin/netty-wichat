@@ -3,6 +3,7 @@ package com.imooc.service;
 import com.imooc.pojo.Users;
 import com.imooc.pojo.vo.FriendRequestVO;
 import com.imooc.pojo.vo.MyFriendsVO;
+import netty.ChatMsg;
 
 import java.util.List;
 
@@ -102,4 +103,27 @@ public interface UserService {
      * @return
      */
     public List<MyFriendsVO> queryMyFriends(String userId);
+
+    /**
+     *
+     * @Description 保存聊天消息到数据库
+     * @return
+     */
+    public String saveMsg(ChatMsg chatMsg);
+
+    /**
+     *
+     * @Description 保存聊天消息到数据库
+     * @return
+     */
+    public String updateMsgSigned(List<String> msgIdList);
+
+    /**
+     * @Description  获取未签收消息列表
+     * @param acceptUserId
+     * @return
+     */
+    public List<com.imooc.pojo.ChatMsg> getUnReadMsgList(String acceptUserId);
+
+
 }

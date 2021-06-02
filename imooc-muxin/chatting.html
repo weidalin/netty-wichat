@@ -31,7 +31,7 @@
 		<div id="msg-outter" class="mui-content">
 			<div id='msg'>
 				
-				<div class="friend_lists">
+				<!--<div class="friend_lists">
 					<div class="header_img">
 						<img src="image/face-default-cat.png" width="40px" height="40px" />
 					</div>
@@ -47,42 +47,8 @@
 					<div class="msg-wrapper left">
 						<p class="msg-right-green">好的，没问题！时间地点？</p>
 					</div>
-				</div>
-				<div class="friend_lists">
-					<div class="header_img">
-						<img src="image/face-default-cat.png" width="40px" height="40px" />
-					</div>
-					<div class="msg-wrapper right">
-						<p class="msg-left-white">晚上过来吃饭？</p>
-					</div>
-				</div>
+				</div>-->
 
-				<div class="me_lists">
-					<div class="header_img">
-						<img src="image/face-default-cat.png" width="40px" height="40px" />
-					</div>
-					<div class="msg-wrapper left">
-						<p class="msg-right-green">好的，没问题！时间地点？</p>
-					</div>
-				</div><div class="friend_lists">
-					<div class="header_img">
-						<img src="image/face-default-cat.png" width="40px" height="40px" />
-					</div>
-					<div class="msg-wrapper right">
-						<p class="msg-left-white">晚上过来2323吃饭？</p>
-					</div>
-				</div>
-
-				<div class="me_lists">
-					<div class="header_img">
-						<img src="image/face-default-cat.png" width="40px" height="40px" />
-					</div>
-					<div class="msg-wrapper left">
-						<p class="msg-right-green">好123？</p>
-					</div>
-				</div>
-
-			</div>
 		</div>
 		
 		<footer>
@@ -98,15 +64,14 @@
 		<script type="application/javascript" src="js/app.js"></script>
 		<script type="text/javascript">
 			// 创建命名空间，只需要把自己的代码，写进入，那么外部就无法访问
-			(function($, doc){
+//			(function($, doc){
 				var friendUserId;
 				var friendNickname;
 				var friendFaceImage;
-					
+				var me;
 				mui.plusReady(function(){
 					//获取我自己的用户信息
-					var me = app.getUserGlobalInfo();
-					
+					me =  app.getUserGlobalInfo();
 					//获取聊天页面的webview
 					var chattringWebview = plus.webview.currentWebview();
 					//设置聊天页面的软键盘样式
@@ -118,15 +83,18 @@
 					friendFaceImage = chattringWebview.friendFaceImage;
 					
 					//标题改为朋友的昵称
-					doc.getElementById("chatting-nickname").innerHTML = friendNickname;
+					document.getElementById("chatting-nickname").innerHTML = friendNickname;
 				
-					var areaMsgList = doc.getElementById("msg");
+					// 渲染初始化的聊天记录
+					initChatHistory();
+				
+					var areaMsgList = document.getElementById("msg");
 					//设置聊天记录进入页面的时候自动滚动到最后一条
 					areaMsgList.scrollTop = areaMsgList.scrollHeight + areaMsgList.offsetHeight;
 				
 					//获取dom控件
-					var msg_text = doc.getElementById("msg-text");
-					var send = doc.getElementById("send");
+					var msg_text = document.getElementById("msg-text");
+					var send = document.getElementById("send");
 					//监听用户输入，使得send按钮变色
 					msg_text.addEventListener("input", function(){
 						var msg_text_val = msg_text.value;
@@ -140,7 +108,7 @@
 					//对挡墙的窗口监听resize事件
 					window.addEventListener("resize", function(){
 						resizeScreen();
-						doc.getElementById("msg-outter").style.
+						document.getElementById("msg-outter").style.
 						paddingBottom="50px";  
 					});
 					//发送消息按钮的事件绑定
@@ -162,20 +130,31 @@
 						//发送消息，渲染消息的html到msg_div之下
 						var faceImg = app.imgServerUrl + me.faceImage;
 						sendMsg(faceImg, msg_text_val);
-						msg_text.value = "";
 						send.setAttribute("class", "mui-btn-gray");
+						
+						// 构建ChatMsg
+						var chatMsg = new app.ChatMsg(me.id, friendUserId, msg_text_val, null);
+						
+						// 构建DataContent
+						var dataContent = new app.DataContent(app.CHAT, chatMsg, null);
+						
 						
 						// 调用websocket 发送消息到netty后端
 						var wsWebview = plus.webview.getWebviewById("imooc-chatlist.html");
-						wsWebview.evalJS("CHAT.chat('"+msg_text_val+"')");
-						wsWebview.evalJS("CHAT.wsmessage('"+msg_text_val+"')");
+						wsWebview.evalJS("CHAT.chat('"+JSON.stringify(dataContent)+"')");
+//						console.log("msg_text_val: " + msg_text_val);
 						
+						msg_text.value = "";
+						
+						// 保存聊天历史记录到本地缓存
+						app.saveUserChatHistory(me.id, friendUserId, msg_text_val, 1);
+						app.saveUserChatSnapshot(me.id, friendUserId, msg_text_val, true);
 						
 						// TODO 接受消息
 						// 模拟接受消息
 //						receiveMsg("模拟接受消息。。。");
 					});
-				});
+				}); 
 				
 				
 				
@@ -190,7 +169,7 @@
 										'<p class="msg-right-green">'+msg+'</p>'+
 									'</div>'+
 								'</div>';
-					var msg_list = doc.getElementById("msg");
+					var msg_list = document.getElementById("msg");
 					msg_list.insertAdjacentHTML("beforeend", msgHtml);
 					
 					playSendMsgSound();
@@ -206,7 +185,7 @@
 											'<p class="msg-left-white">'+msg+'</p>'+
 										'</div>'+
 									'</div>';
-					var msg_list = doc.getElementById("msg");
+					var msg_list = document.getElementById("msg");
 					msg_list.insertAdjacentHTML("beforeend", msgHtml);
 					playReceiveMsgSound();
 				}
@@ -222,15 +201,56 @@
 					audioPlayer.play();
 				}
 				
+				
+				
+				
+				
 				//重新调整聊天窗口位置
 				function resizeScreen(){
-					var areaMsgList = doc.getElementById("msg");
+					var areaMsgList = document.getElementById("msg");
 					//设置聊天记录进入页面的时候自动滚动到最后一条
 					areaMsgList.scrollTop = areaMsgList.scrollHeight + areaMsgList.offsetHeight;
 				
 				}
 				
-			}(mui, document));
+				// 初始化用户的聊天记录
+				function initChatHistory(){
+					var msg_list = document.getElementById("msg");
+					var myId = me.id;
+					var myFaceImg = me.faceImage;
+//					var friendUserId;
+//					var friendNickname;
+//					var friendFaceImage;
+					var chatHistoryList = app.getUserChatHistory(myId, friendUserId);
+					var togetherHTML = "";
+					for(var i = 0; i < chatHistoryList.length; i++){
+						var singleMsg = chatHistoryList[i];
+						if(singleMsg.flag == 2){
+							togetherHTML += '</div><div class="friend_lists">'+
+										'<div class="header_img">'+
+											'<img src="'+app.imgServerUrl + friendFaceImage+'" width="40px" height="40px" />'+
+										'</div>'+
+										'<div class="msg-wrapper right">'+
+											'<p class="msg-left-white">'+singleMsg.msg+'</p>'+
+										'</div>'+
+									'</div>';
+						}else if(singleMsg.flag == 1){
+							togetherHTML += '<div class="me_lists">'+
+									'<div class="header_img">'+
+										'<img src="'+app.imgServerUrl + myFaceImg +'" width="40px" height="40px" />'+
+									'</div>'+
+									'<div class="msg-wrapper left">'+
+										'<p class="msg-right-green">'+singleMsg.msg+'</p>'+
+									'</div>'+
+								'</div>';
+						}
+					}
+					var msg_list = document.getElementById("msg");
+					msg_list.insertAdjacentHTML("beforeend", togetherHTML);
+					
+				}
+				
+//			}(mui, document));
 			
 		</script>
 	</body>
