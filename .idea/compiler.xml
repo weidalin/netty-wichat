@@ -8,12 +8,14 @@
         <outputRelativeToContentRoot value="true" />
         <module name="netty_hello" />
         <module name="netty" />
+        <module name="netty-wichat" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="netty" options="-parameters" />
+      <module name="netty-wichat" options="-parameters" />
     </option>
   </component>
 </project>
